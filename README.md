@@ -149,9 +149,7 @@ If you find this project useful, consider giving it a ⭐.
 
 **Ayesha Nagma**
 
-LinkedIn: *(Add your LinkedIn profile)*
-
-GitHub: *(Add your GitHub profile)*
+LinkedIn: https://www.linkedin.com/in/ayesha-nagma-827336277/
 
 ---
 
