@@ -1,0 +1,357 @@
+{
+  "name": "AI Content Creation",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "217f6ea4-17d9-4de9-af43-3fe7c1cfb60c",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1JvvD7cipHBP3z2PanRV0DsF4ttRbcZL8vLW_5Zjk3h8",
+          "mode": "list",
+          "cachedResultName": "AI Content",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JvvD7cipHBP3z2PanRV0DsF4ttRbcZL8vLW_5Zjk3h8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JvvD7cipHBP3z2PanRV0DsF4ttRbcZL8vLW_5Zjk3h8/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Status",
+              "lookupValue": "Pending"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e86ef165-2f1f-4133-b396-a183a6721dc0",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EdIJgFRI3n0xuNVK",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1JvvD7cipHBP3z2PanRV0DsF4ttRbcZL8vLW_5Zjk3h8",
+          "mode": "list",
+          "cachedResultName": "AI Content",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JvvD7cipHBP3z2PanRV0DsF4ttRbcZL8vLW_5Zjk3h8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 492943681,
+          "mode": "list",
+          "cachedResultName": "Sheet2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JvvD7cipHBP3z2PanRV0DsF4ttRbcZL8vLW_5Zjk3h8/edit#gid=492943681"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        0
+      ],
+      "id": "2bf2bc25-5281-4999-b762-5576cbec85a1",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EdIJgFRI3n0xuNVK",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst topicData = $(\"Get row(s) in sheet\").all()[0]?.json;\n\nconst updatedItems = items.map((item) => {\n  let systemPrompt = item?.json[\"System Prompt\"];\n  let userPrompt = item?.json[\"User Prompt\"];\n\n  for (let key in topicData) {\n    const placeholder = `{{${key}}}`;\n    const value = topicData[key];\n    systemPrompt = systemPrompt.replace(placeholder, value);\n    userPrompt = userPrompt.replace(placeholder, value);\n  }\n\n  item.json[\"System Prompt\"] = systemPrompt;\n  item.json[\"User Prompt\"] = userPrompt;\n\n  return item;\n});\n\nreturn updatedItems;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "7a0e2681-4c39-441f-a8f1-9660c6c1709f",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ed056998-130a-4a4b-a9e6-27ac9e18ce89",
+              "leftValue": "={{ $json[\"Content Platform\"] }}",
+              "rightValue": "Twitter (x)",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        832,
+        0
+      ],
+      "id": "cb794b23-da75-4b8b-9027-a0b3d14ac0dd",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "={{ $json[\"User Prompt\"] }}"
+            },
+            {
+              "role": "system",
+              "content": "={{ $json[\"System Prompt\"] }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "a5a5b468-62e1-4bba-aeed-9bb5cfdbc477",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "824d65b6-e1a0-4066-aaa4-e1ebea1c6824",
+              "name": "output[0].content",
+              "value": "={{ $json.output[0].content[0].text.replace(/<[^>]*>/g, '').replace(/\\s+/g, ' ').trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1392,
+        0
+      ],
+      "id": "59db23d5-e8ce-45d2-b82b-bbec74d98abe",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.output[0].content }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        0
+      ],
+      "id": "cf5a349e-1260-46d5-ad1b-d60a89c2a5e4",
+      "name": "Create Tweet",
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "KX8q9NwpixHINtFw",
+          "name": "X account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour",
+              "minute": 59
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1JvvD7cipHBP3z2PanRV0DsF4ttRbcZL8vLW_5Zjk3h8",
+          "mode": "list",
+          "cachedResultName": "AI Content",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JvvD7cipHBP3z2PanRV0DsF4ttRbcZL8vLW_5Zjk3h8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JvvD7cipHBP3z2PanRV0DsF4ttRbcZL8vLW_5Zjk3h8/edit#gid=0"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -224
+      ],
+      "id": "5b776650-0e35-414a-a39f-0f06ec75ca41",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "ab9jN6BOOXGgdV5v",
+          "name": "Google Sheets Trigger OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Create Tweet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "41dd1214-1f7a-4325-9de2-0d4448f40ae6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b5e940fc6cd7312eec2ae1762aa62f21e37538f4cf14576855aaeb61ec3599a1"
+  },
+  "nodeGroups": [],
+  "id": "YDH8ezn9N2aR834u",
+  "tags": []
+}
