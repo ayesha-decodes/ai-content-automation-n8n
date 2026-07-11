@@ -83,10 +83,6 @@ Adding these platforms requires only the corresponding API node after the AI gen
 
 ---
 
-## 📸 Workflow Preview
-
-> Add a screenshot of your workflow here.
-
 ---
 
 ## 📁 Repository Structure
@@ -95,8 +91,6 @@ Adding these platforms requires only the corresponding API node after the AI gen
 .
 ├── workflow.json
 ├── README.md
-└── images/
-    └── workflow.png
 ```
 
 ---
